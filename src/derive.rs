@@ -129,8 +129,14 @@ fn handle_tuple(variant: &VariantParsed, functions: &mut Vec<TokenStream2>, enum
     };
 
     let var_fn = &variant.used_name;
+    let var_ref_fn = format_ident!("{}_ref", var_fn);
+    let var_mut_fn = format_ident!("{}_mut", var_fn);
     let var_or_fn = format_ident!("{}_or", var_fn);
+    let var_ref_or_fn = format_ident!("{}_ref_or", var_fn);
+    let var_mut_or_fn = format_ident!("{}_mut_or", var_fn);
     let var_or_else_fn = format_ident!("{}_or_else", var_fn);
+    let var_ref_or_else_fn = format_ident!("{}_ref_or_else", var_fn);
+    let var_mut_or_else_fn = format_ident!("{}_mut_or_else", var_fn);
 
     let ok_deprecation = deprecate(var_fn);
     let ok_or_deprecation = deprecate(&var_or_fn);
@@ -145,11 +151,47 @@ fn handle_tuple(variant: &VariantParsed, functions: &mut Vec<TokenStream2>, enum
             }
         }
 
+        pub fn #var_ref_fn(&self) -> Option<&(#types)> {
+            match self {
+                #var_pattern => Some((#vars)),
+                _ => None,
+            }
+        }
+
+        pub fn #var_mut_fn(&self) -> Option<&mut (#types)> {
+            match self {
+                #var_pattern => Some((#vars)),
+                _ => None,
+            }
+        }
+
         pub fn #var_or_fn<E>(self, or: E) -> Result<(#types), E> {
             self.#var_or_else_fn(|| or)
         }
 
+        pub fn #var_ref_or_fn<E>(&self, or: E) -> Result<(#types), E> {
+            self.#var_ref_or_else_fn(|| or)
+        }
+
+        pub fn #var_mut_or_fn<E>(&mut self, or: E) -> Result<(#types), E> {
+            self.#var_mut_or_else_fn(|| or)
+        }
+
         pub fn #var_or_else_fn<E, F: FnOnce() -> E>(self, or_else: F) -> Result<(#types), E> {
+            match self {
+                #var_pattern => Ok((#vars)),
+                _ => Err(or_else())
+            }
+        }
+
+        pub fn #var_ref_or_else_fn<E, F: FnOnce() -> E>(&self, or_else: F) -> Result<(#types), E> {
+            match self {
+                #var_pattern => Ok((#vars)),
+                _ => Err(or_else())
+            }
+        }
+
+        pub fn #var_mut_or_else_fn<E, F: FnOnce() -> E>(&mut self, or_else: F) -> Result<(#types), E> {
             match self {
                 #var_pattern => Ok((#vars)),
                 _ => Err(or_else())
