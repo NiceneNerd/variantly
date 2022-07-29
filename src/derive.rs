@@ -169,11 +169,11 @@ fn handle_tuple(variant: &VariantParsed, functions: &mut Vec<TokenStream2>, enum
             self.#var_or_else_fn(|| or)
         }
 
-        pub fn #var_ref_or_fn<E>(&self, or: E) -> Result<(#types), E> {
+        pub fn #var_ref_or_fn<E>(&self, or: E) -> Result<&(#types), E> {
             self.#var_ref_or_else_fn(|| or)
         }
 
-        pub fn #var_mut_or_fn<E>(&mut self, or: E) -> Result<(#types), E> {
+        pub fn #var_mut_or_fn<E>(&mut self, or: E) -> Result<&mut (#types), E> {
             self.#var_mut_or_else_fn(|| or)
         }
 
@@ -184,14 +184,14 @@ fn handle_tuple(variant: &VariantParsed, functions: &mut Vec<TokenStream2>, enum
             }
         }
 
-        pub fn #var_ref_or_else_fn<E, F: FnOnce() -> E>(&self, or_else: F) -> Result<(#types), E> {
+        pub fn #var_ref_or_else_fn<E, F: FnOnce() -> E>(&self, or_else: F) -> Result<&(#types), E> {
             match self {
                 #var_pattern => Ok((#vars)),
                 _ => Err(or_else())
             }
         }
 
-        pub fn #var_mut_or_else_fn<E, F: FnOnce() -> E>(&mut self, or_else: F) -> Result<(#types), E> {
+        pub fn #var_mut_or_else_fn<E, F: FnOnce() -> E>(&mut self, or_else: F) -> Result<&mut (#types), E> {
             match self {
                 #var_pattern => Ok((#vars)),
                 _ => Err(or_else())
