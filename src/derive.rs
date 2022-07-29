@@ -158,7 +158,7 @@ fn handle_tuple(variant: &VariantParsed, functions: &mut Vec<TokenStream2>, enum
             }
         }
 
-        pub fn #var_mut_fn(&self) -> Option<&mut (#types)> {
+        pub fn #var_mut_fn(&mut self) -> Option<&mut (#types)> {
             match self {
                 #var_pattern => Some((#vars)),
                 _ => None,
